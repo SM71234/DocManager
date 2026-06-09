@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body text-center p-5">
+
+        <h2 class="text-danger">
+
+            Patient Already Exists
+
+        </h2>
+
+        <div class="alert alert-danger">
+
+            This patient is already registered in the system.
+
+        </div>
+
+        <hr>
+
+        <h4>
+
+            {{ patient.name }}
+
+        </h4>
+
+        <p>
+
+            <strong>Patient ID:</strong>
+
+            {{ patient.patient_code }}
+
+        </p>
+
+        <p>
+
+            <strong>Phone:</strong>
+
+            {{ patient.phone }}
+
+        </p>
+
+        <div class="mt-4">
+
+            <a
+                href="{{ url_for(
+                    'patient_profile',
+                    patient_id=patient.id
+                ) }}"
+                class="btn btn-primary">
+
+                View Profile
+
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'new_visit',
+                    patient_id=patient.id
+                ) }}"
+                class="btn btn-success">
+
+                Add New Visit
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

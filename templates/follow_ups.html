@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-warning">
+                    Today's Follow Ups
+                </h6>
+
+                <h2>
+                    {{
+                        visits
+                        | selectattr(
+                            "follow_up_date",
+                            "equalto",
+                            today
+                        )
+                        | list
+                        | length
+                    }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-success">
+                    Upcoming
+                </h6>
+
+                <h2>
+                    {{
+                        visits
+                        | selectattr(
+                            "follow_up_date",
+                            "gt",
+                            today
+                        )
+                        | list
+                        | length
+                    }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body">
+
+                <h6 class="text-danger">
+                    Overdue
+                </h6>
+
+                <h2>
+                    {{
+                        visits
+                        | selectattr(
+                            "follow_up_date",
+                            "lt",
+                            today
+                        )
+                        | list
+                        | length
+                    }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-header">
+
+        <h4 class="mb-0">
+
+            Follow Up List
+
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if visits %}
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Patient</th>
+
+                    <th>Phone</th>
+
+                    <th>Follow Up Date</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for visit in visits %}
+
+                <tr>
+
+                    <td>
+
+                        {{ visit.patient.name }}
+
+                    </td>
+
+                    <td>
+
+                        {{ visit.patient.phone }}
+
+                    </td>
+
+                    <td>
+
+                        {{ visit.follow_up_date }}
+
+                    </td>
+
+                    <td>
+
+                        {% if visit.follow_up_date == today %}
+
+                            <span class="badge bg-warning">
+
+                                Today
+
+                            </span>
+
+                        {% elif visit.follow_up_date < today %}
+
+                            <span class="badge bg-danger">
+
+                                Overdue
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-success">
+
+                                Upcoming
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <a
+                            href="{{ url_for(
+                                'patient_profile',
+                                patient_id=visit.patient.id
+                            ) }}"
+                            class="btn btn-sm btn-primary">
+
+                            View
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="alert alert-info">
+
+            No follow ups found.
+
+        </div>
+
+        {% endif %}
+
+    </div>
+    <li>
+    <a
+        href="{{ url_for('appointments') }}"
+        class="{% if request.endpoint == 'appointments' %}active{% endif %}">
+
+        Appointments
+
+    </a>
+</li>
+
+</div>
+
+{% endblock %}

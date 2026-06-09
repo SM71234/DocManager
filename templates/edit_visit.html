@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-header">
+
+        <h3>Edit Visit</h3>
+
+    </div>
+
+    <div class="card-body">
+
+        <h5>
+            Patient:
+            {{ patient.name }}
+        </h5>
+
+        <hr>
+
+        <form method="POST">
+
+            <div class="mb-3">
+
+                <label>Reason</label>
+
+                <textarea
+                    name="reason"
+                    class="form-control"
+                    required>{{ visit.reason }}</textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Diagnosis</label>
+
+                <textarea
+                    name="diagnosis"
+                    class="form-control">{{ visit.diagnosis }}</textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Treatment</label>
+
+                <textarea
+                    name="treatment"
+                    class="form-control">{{ visit.treatment }}</textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Prescription</label>
+
+                <textarea
+                    name="prescription"
+                    class="form-control">{{ visit.prescription }}</textarea>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Notes</label>
+
+                <textarea
+                    name="notes"
+                    class="form-control">{{ visit.notes }}</textarea>
+
+            </div>
+
+            <button
+                class="btn btn-primary">
+
+                Update Visit
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

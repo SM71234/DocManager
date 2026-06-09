@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow mb-4">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+
+                    <h2 class="mb-0">
+
+                        {{ patient.name }}
+
+                    </h2>
+
+                    <span class="badge bg-primary">
+
+                        {{ patient.patient_code }}
+
+                    </span>
+
+                </div>
+
+                <p class="mb-1">
+                    <strong>Phone:</strong>
+                    {{ patient.phone }}
+                </p>
+
+                <p class="mb-1">
+                    <strong>Age:</strong>
+                    {{ patient.age }}
+                </p>
+
+                <p class="mb-1">
+                    <strong>Gender:</strong>
+                    {{ patient.gender }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Address:</strong>
+                    {{ patient.address }}
+                </p>
+
+            </div>
+
+            <div class="text-end">
+
+                <h4 class="mb-3">
+
+                    Total Visits: {{ visits|length }}
+
+                </h4>
+
+                <a
+                    href="{{ url_for(
+                        'new_visit',
+                        patient_id=patient.id
+                    ) }}"
+                    class="btn btn-success">
+
+                    + New Visit
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'edit_patient',
+                        patient_id=patient.id
+                    ) }}"
+                    class="btn btn-warning">
+
+                    Edit Patient
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-header">
+
+        <h5 class="mb-0">
+
+            Patient Timeline
+
+        </h5>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if visits %}
+
+            <div class="timeline">
+
+                {% for visit in visits %}
+
+                <div class="timeline-item">
+
+                    <div class="timeline-dot">
+
+                        <i class="bi bi-heart-pulse-fill"></i>
+
+                    </div>
+
+                    <div class="timeline-content">
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+
+                            <h5 class="mb-0">
+
+                                {{ visit.visit_date }}
+
+                            </h5>
+
+                            <a
+                                href="{{ url_for(
+                                    'visit_details',
+                                    visit_id=visit.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary">
+
+                                View Visit
+
+                            </a>
+
+                        </div>
+
+                        <p>
+                            <strong>Reason:</strong>
+                            {{ visit.reason }}
+                        </p>
+
+                        <p>
+                            <strong>Diagnosis:</strong>
+                            {{ visit.diagnosis }}
+                        </p>
+
+                        <p>
+                            <strong>Treatment:</strong>
+                            {{ visit.treatment }}
+                        </p>
+
+                        {% if visit.follow_up_date %}
+
+                        <span class="badge bg-warning text-dark">
+
+                            Follow Up:
+                            {{ visit.follow_up_date }}
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info">
+
+                No visits yet.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
