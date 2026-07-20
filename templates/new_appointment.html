@@ -1,108 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-calendar-plus me-2"></i> Schedule Patient Appointment</h4>
+        <a href="{{ url_for('appointments.appointments') }}" class="btn btn-sm btn-light border">Cancel</a>
+      </div>
 
-<div class="card shadow">
-
-    <div class="card-header">
-
-        <h4>New Appointment</h4>
-
-    </div>
-
-    <div class="card-body">
-
-        <form method="POST">
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Patient
-
-                </label>
-
-                <select
-                    name="patient_id"
-                    class="form-select"
-                    required>
-
-                    <option value="">
-                        Select Patient
-                    </option>
-
-                    {% for patient in patients %}
-
-                    <option value="{{ patient.id }}">
-
-                        {{ patient.name }}
-
-                    </option>
-
-                    {% endfor %}
-
-                </select>
-
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('appointments.new_appointment') }}">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Select Patient <span class="text-danger">*</span></label>
+              <select name="patient_id" class="form-select form-select-lg" required>
+                <option value="">Choose a patient from directory...</option>
+                {% for p in patients %}
+                  <option value="{{ p.id }}">{{ p.name }} ({{ p.patient_code }}) - Phone: {{ p.phone }}</option>
+                {% endfor %}
+              </select>
             </div>
 
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Appointment Date
-
-                </label>
-
-                <input
-                    type="date"
-                    name="appointment_date"
-                    class="form-control"
-                    required>
-
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Appointment Date <span class="text-danger">*</span></label>
+              <input type="date" name="appointment_date" class="form-control" required />
             </div>
 
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Appointment Time
-
-                </label>
-
-                <input
-                    type="time"
-                    name="appointment_time"
-                    class="form-control"
-                    required>
-
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Appointment Time <span class="text-danger">*</span></label>
+              <input type="time" name="appointment_time" class="form-control" required />
             </div>
 
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Notes
-
-                </label>
-
-                <textarea
-                    name="notes"
-                    class="form-control"></textarea>
-
+            <div class="col-12">
+              <label class="form-label fw-semibold">Notes / Reason for Visit</label>
+              <textarea name="notes" class="form-control" rows="3" placeholder="e.g. Regular monthly BP check, Blood test discussion"></textarea>
             </div>
+          </div>
 
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Save Appointment
-
+          <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('appointments.appointments') }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-calendar-check me-1"></i> Confirm Booking
             </button>
-
+          </div>
         </form>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

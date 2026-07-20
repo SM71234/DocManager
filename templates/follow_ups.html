@@ -1,232 +1,67 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<div class="row mb-4">
-
-    <div class="col-md-4">
-
-        <div class="card shadow-sm border-0">
-
-            <div class="card-body">
-
-                <h6 class="text-warning">
-                    Today's Follow Ups
-                </h6>
-
-                <h2>
-                    {{
-                        visits
-                        | selectattr(
-                            "follow_up_date",
-                            "equalto",
-                            today
-                        )
-                        | list
-                        | length
-                    }}
-                </h2>
-
-            </div>
-
-        </div>
-
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-clock-history me-2"></i> Follow-up Reminders</h4>
+        <p class="text-muted small mb-0">Track today's scheduled follow-ups, upcoming reviews, and overdue cases.</p>
+      </div>
+      <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">{{ visits|length }} Total Reminders</span>
     </div>
 
-    <div class="col-md-4">
-
-        <div class="card shadow-sm border-0">
-
-            <div class="card-body">
-
-                <h6 class="text-success">
-                    Upcoming
-                </h6>
-
-                <h2>
-                    {{
-                        visits
-                        | selectattr(
-                            "follow_up_date",
-                            "gt",
-                            today
-                        )
-                        | list
-                        | length
-                    }}
-                </h2>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-md-4">
-
-        <div class="card shadow-sm border-0">
-
-            <div class="card-body">
-
-                <h6 class="text-danger">
-                    Overdue
-                </h6>
-
-                <h2>
-                    {{
-                        visits
-                        | selectattr(
-                            "follow_up_date",
-                            "lt",
-                            today
-                        )
-                        | list
-                        | length
-                    }}
-                </h2>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div class="card shadow">
-
-    <div class="card-header">
-
-        <h4 class="mb-0">
-
-            Follow Up List
-
-        </h4>
-
-    </div>
-
-    <div class="card-body">
-
-        {% if visits %}
-
-        <table class="table table-hover">
-
-            <thead>
-
-                <tr>
-
-                    <th>Patient</th>
-
-                    <th>Phone</th>
-
-                    <th>Follow Up Date</th>
-
-                    <th>Status</th>
-
-                    <th>Action</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                {% for visit in visits %}
-
-                <tr>
-
-                    <td>
-
-                        {{ visit.patient.name }}
-
-                    </td>
-
-                    <td>
-
-                        {{ visit.patient.phone }}
-
-                    </td>
-
-                    <td>
-
-                        {{ visit.follow_up_date }}
-
-                    </td>
-
-                    <td>
-
-                        {% if visit.follow_up_date == today %}
-
-                            <span class="badge bg-warning">
-
-                                Today
-
-                            </span>
-
-                        {% elif visit.follow_up_date < today %}
-
-                            <span class="badge bg-danger">
-
-                                Overdue
-
-                            </span>
-
-                        {% else %}
-
-                            <span class="badge bg-success">
-
-                                Upcoming
-
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-                    <td>
-
-                        <a
-                            href="{{ url_for(
-                                'patient_profile',
-                                patient_id=visit.patient.id
-                            ) }}"
-                            class="btn btn-sm btn-primary">
-
-                            View
-
-                        </a>
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
+    {% if visits %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Status</th>
+              <th>Follow-up Date</th>
+              <th>Patient Name</th>
+              <th>Phone</th>
+              <th>Diagnosis / Reason</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in visits %}
+              {% set is_overdue = v.follow_up_date < today %}
+              {% set is_today = v.follow_up_date == today %}
+              <tr class="{% if is_overdue %}table-danger table-opacity-25{% elif is_today %}table-warning table-opacity-25{% endif %}">
+                <td>
+                  {% if is_overdue %}
+                    <span class="badge bg-danger text-white fw-bold"><i class="bi bi-exclamation-circle me-1"></i> Overdue</span>
+                  {% elif is_today %}
+                    <span class="badge bg-warning text-dark fw-bold"><i class="bi bi-bell-fill me-1"></i> Due Today</span>
+                  {% else %}
+                    <span class="badge bg-info text-dark fw-bold">Upcoming</span>
+                  {% endif %}
+                </td>
+                <td class="fw-bold">{{ v.follow_up_date.strftime('%d %b %Y') }}</td>
+                <td>
+                  <a href="{{ url_for('patients.patient_profile', patient_id=v.patient.id) }}" class="fw-bold text-dark text-decoration-none">
+                    {{ v.patient.name }} <small class="text-muted">({{ v.patient.patient_code }})</small>
+                  </a>
+                </td>
+                <td class="fw-semibold">{{ v.patient.phone }}</td>
+                <td>{{ v.diagnosis or v.reason or '-' }}</td>
+                <td class="text-end">
+                  <a href="tel:{{ v.patient.phone }}" class="btn btn-sm btn-outline-success rounded-circle p-2 me-1" title="Call Patient"><i class="bi bi-telephone-fill"></i></a>
+                  <a href="{{ url_for('patients.patient_profile', patient_id=v.patient.id) }}" class="btn btn-sm btn-primary rounded-pill px-3">View Patient</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
         </table>
-
-        {% else %}
-
-        <div class="alert alert-info">
-
-            No follow ups found.
-
-        </div>
-
-        {% endif %}
-
-    </div>
-    <li>
-    <a
-        href="{{ url_for('appointments') }}"
-        class="{% if request.endpoint == 'appointments' %}active{% endif %}">
-
-        Appointments
-
-    </a>
-</li>
-
+      </div>
+    {% else %}
+      <div class="empty-state py-5">
+        <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+        <h5 class="fw-bold">No Follow-up Reminders Scheduled</h5>
+        <p class="text-muted small">When you create visits and specify follow-up dates, they will automatically appear here.</p>
+      </div>
+    {% endif %}
+  </div>
 </div>
-
 {% endblock %}

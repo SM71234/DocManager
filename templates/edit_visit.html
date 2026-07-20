@@ -1,88 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-pencil-square me-2"></i> Edit Visit Record</h4>
+        <a href="{{ url_for('visits.visit_details', visit_id=visit.id) }}" class="btn btn-sm btn-light border">Back</a>
+      </div>
 
-<div class="card shadow">
-
-    <div class="card-header">
-
-        <h3>Edit Visit</h3>
-
-    </div>
-
-    <div class="card-body">
-
-        <h5>
-            Patient:
-            {{ patient.name }}
-        </h5>
-
-        <hr>
-
-        <form method="POST">
-
-            <div class="mb-3">
-
-                <label>Reason</label>
-
-                <textarea
-                    name="reason"
-                    class="form-control"
-                    required>{{ visit.reason }}</textarea>
-
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('visits.edit_visit', visit_id=visit.id) }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Chief Reason / Complaint</label>
+              <textarea name="reason" class="form-control" rows="2">{{ visit.reason or '' }}</textarea>
             </div>
 
-            <div class="mb-3">
-
-                <label>Diagnosis</label>
-
-                <textarea
-                    name="diagnosis"
-                    class="form-control">{{ visit.diagnosis }}</textarea>
-
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Diagnosis</label>
+              <textarea name="diagnosis" class="form-control" rows="2">{{ visit.diagnosis or '' }}</textarea>
             </div>
 
-            <div class="mb-3">
-
-                <label>Treatment</label>
-
-                <textarea
-                    name="treatment"
-                    class="form-control">{{ visit.treatment }}</textarea>
-
+            <div class="col-12">
+              <label class="form-label fw-semibold">Treatment Plan</label>
+              <textarea name="treatment" class="form-control" rows="2">{{ visit.treatment or '' }}</textarea>
             </div>
 
-            <div class="mb-3">
-
-                <label>Prescription</label>
-
-                <textarea
-                    name="prescription"
-                    class="form-control">{{ visit.prescription }}</textarea>
-
+            <div class="col-12">
+              <label class="form-label fw-semibold">Prescription Text</label>
+              <textarea name="prescription" class="form-control" rows="4">{{ visit.prescription or '' }}</textarea>
             </div>
 
-            <div class="mb-3">
-
-                <label>Notes</label>
-
-                <textarea
-                    name="notes"
-                    class="form-control">{{ visit.notes }}</textarea>
-
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Follow-up Date</label>
+              <input type="date" name="follow_up_date" class="form-control" value="{{ visit.follow_up_date.strftime('%Y-%m-%d') if visit.follow_up_date else '' }}" />
             </div>
 
-            <button
-                class="btn btn-primary">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Doctor Notes</label>
+              <textarea name="notes" class="form-control" rows="2">{{ visit.notes or '' }}</textarea>
+            </div>
+          </div>
 
-                Update Visit
-
+          <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('visits.visit_details', visit_id=visit.id) }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-check-lg me-1"></i> Update Visit Entry
             </button>
-
+          </div>
         </form>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

@@ -1,71 +1,271 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+@media print {
+  body { background: white !important; color: black !important; padding: 0 !important; }
+  .sidebar, .topbar, .mobile-bottom-nav, .fab-container, .no-print { display: none !important; }
+  .main-content { margin-left: 0 !important; padding: 0 !important; }
+  .bill-container { box-shadow: none !important; border: none !important; padding: 0 !important; }
+}
 
-<div class="card shadow">
+.bill-card-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+}
 
-    <div class="card-header">
+.bill-icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
 
-        <h3>
+.bill-table-head {
+    background-color: #e0f2fe !important;
+    color: #0f172a !important;
+}
 
-            Invoice
+.bill-footer-bar {
+    background: #1e293b;
+    color: white;
+    border-radius: 0 0 16px 16px;
+    padding: 12px;
+    text-align: center;
+    font-size: 13px;
+}
+</style>
 
-        </h3>
-
+<div class="row justify-content-center">
+  <div class="col-lg-9 col-xl-8">
+    <!-- Action Bar (Hidden on Print) -->
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+      <a href="{{ url_for('patients.patient_profile', patient_id=patient.id, tab='billing') }}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-1"></i> Back to Patient Profile
+      </a>
+      <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-outline-primary fw-bold shadow-sm">
+          <i class="bi bi-printer me-1"></i> Print Bill
+        </button>
+        <a href="{{ url_for('billing.bill_pdf', bill_id=bill.id) }}" class="btn btn-success fw-bold shadow-sm">
+          <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
+        </a>
+      </div>
     </div>
 
-    <div class="card-body">
+    <!-- Official Patient Bill Template -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white bill-container p-4 p-md-5">
+      <!-- 1. Header Bar: Clinic Branding & Info -->
+      <div class="row align-items-center border-bottom pb-4 mb-4 g-3">
+        <div class="col-md-7">
+          <div class="d-flex align-items-center gap-3">
+            {% if current_user.logo %}
+              <img src="{{ url_for('static', filename='uploads/' + current_user.logo) }}" style="max-height: 60px; max-width: 120px; object-fit: contain;" alt="Clinic Logo" />
+            {% else %}
+              <div class="avatar bg-primary text-white display-6 rounded-circle" style="width: 50px; height: 50px;">{{ current_user.name[0] }}</div>
+            {% endif %}
+            <div>
+              <h2 class="fw-extrabold text-primary m-0" style="font-family: 'Outfit', sans-serif;">{{ current_user.clinic_name }}</h2>
+              <small class="text-muted d-block fw-semibold">Your Health, Our Priority</small>
+            </div>
+          </div>
+        </div>
 
-        <h5>
+        <div class="col-md-5 text-md-end text-muted small">
+          <div><i class="bi bi-geo-alt-fill text-primary me-1"></i> {{ current_user.clinic_address or '123 Medical Center, Main City' }}</div>
+          <div><i class="bi bi-telephone-fill text-primary me-1"></i> {{ current_user.phone }}</div>
+          <div><i class="bi bi-envelope-fill text-primary me-1"></i> {{ current_user.email }}</div>
+        </div>
+      </div>
 
-            Patient:
-            {{ patient.name }}
+      <!-- 2. "Patient Bill" Title & Metadata Box -->
+      <div class="row align-items-center mb-4">
+        <div class="col-6">
+          <h1 class="display-5 fw-extrabold text-dark m-0" style="font-family: 'Outfit', sans-serif;">Patient Bill</h1>
+        </div>
+        <div class="col-6 text-end">
+          <div class="d-inline-block text-start bg-primary-subtle border border-primary-subtle rounded-3 p-3" style="min-width: 200px;">
+            <div class="d-flex justify-content-between gap-3"><span class="text-muted small">Bill No:</span> <strong class="text-dark">BC-2026-{{ "%04d"|format(bill.id) }}</strong></div>
+            <div class="d-flex justify-content-between gap-3"><span class="text-muted small">Date:</span> <span class="fw-semibold text-dark">{{ bill.created_at.strftime('%d %b %Y') }}</span></div>
+            <div class="d-flex justify-content-between gap-3"><span class="text-muted small">Time:</span> <span class="fw-semibold text-dark">{{ bill.created_at.strftime('%I:%M %p') }}</span></div>
+          </div>
+        </div>
+      </div>
 
-        </h5>
+      <!-- 3. Side-by-Side Cards: Patient Details & Doctor Details -->
+      <div class="row g-3 mb-4">
+        <!-- Patient Details -->
+        <div class="col-md-6">
+          <div class="bill-card-box h-100">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="bill-icon-circle"><i class="bi bi-person"></i></div>
+              <h5 class="fw-bold m-0 text-dark">Patient Details</h5>
+            </div>
+            <table class="table table-borderless table-sm m-0 align-middle">
+              <tr><td class="text-muted w-35">Name:</td><th class="text-dark">{{ patient.name }}</th></tr>
+              <tr><td class="text-muted">Patient ID:</td><th class="text-dark">{{ patient.patient_code }}</th></tr>
+              <tr><td class="text-muted">Age / Gender:</td><th class="text-dark">{{ patient.age or 'N/A' }} Years / {{ patient.gender or 'N/A' }}</th></tr>
+              <tr><td class="text-muted">Phone:</td><th class="text-dark">{{ patient.phone }}</th></tr>
+            </table>
+          </div>
+        </div>
 
-        <hr>
+        <!-- Doctor Details -->
+        <div class="col-md-6">
+          <div class="bill-card-box h-100">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="bill-icon-circle"><i class="bi bi-person-badge"></i></div>
+              <h5 class="fw-bold m-0 text-dark">Doctor Details</h5>
+            </div>
+            <div class="fw-bold text-dark fs-5">Dr. {{ current_user.name }}</div>
+            <div class="text-muted small mb-1">{{ current_user.qualification or 'MBBS, MD (General Medicine)' }}</div>
+            <div class="text-muted small">Reg. No: MMC/2019/12345</div>
+          </div>
+        </div>
+      </div>
 
-        <table class="table">
-
+      <!-- 4. Itemized Table -->
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle">
+          <thead class="bill-table-head">
             <tr>
-                <th>Consultation Fee</th>
-                <td>₹{{ bill.consultation_fee }}</td>
+              <th style="width: 8%;" class="text-center">Sr. No.</th>
+              <th style="width: 42%;">Description</th>
+              <th style="width: 15%;" class="text-center">Quantity</th>
+              <th style="width: 17%;" class="text-end">Rate (₹)</th>
+              <th style="width: 18%;" class="text-end">Amount (₹)</th>
             </tr>
-
+          </thead>
+          <tbody>
+            {% set row_idx = 1 %}
+            {% if bill.consultation_fee > 0 %}
             <tr>
-                <th>Medicine Charges</th>
-                <td>₹{{ bill.medicine_fee }}</td>
+              <td class="text-center fw-bold">{{ row_idx }}</td>
+              <td><div class="fw-bold text-dark">Consultation Fee</div></td>
+              <td class="text-center">1</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.consultation_fee) }}</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.consultation_fee) }}</td>
             </tr>
+            {% set row_idx = row_idx + 1 %}
+            {% endif %}
 
+            {% if bill.medicine_fee > 0 %}
             <tr>
-                <th>Procedure Charges</th>
-                <td>₹{{ bill.procedure_fee }}</td>
+              <td class="text-center fw-bold">{{ row_idx }}</td>
+              <td><div class="fw-bold text-dark">Medicine Pack / Prescriptions</div></td>
+              <td class="text-center">1</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.medicine_fee) }}</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.medicine_fee) }}</td>
             </tr>
+            {% set row_idx = row_idx + 1 %}
+            {% endif %}
 
-            <tr class="table-success">
-
-                <th>Total</th>
-
-                <th>
-                    ₹{{ bill.total_amount }}
-                </th>
-                
+            {% if bill.procedure_fee > 0 %}
+            <tr>
+              <td class="text-center fw-bold">{{ row_idx }}</td>
+              <td><div class="fw-bold text-dark">Clinical Procedures & Tests</div></td>
+              <td class="text-center">1</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.procedure_fee) }}</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.procedure_fee) }}</td>
             </tr>
-            <a
-                href="{{ url_for(
-                    'bill_pdf',
-                    bill_id=bill.id
-                ) }}"
-                class="btn btn-success">
+            {% set row_idx = row_idx + 1 %}
+            {% endif %}
 
-                Download PDF
-
-            </a>
-
+            {% if row_idx == 1 %}
+            <tr>
+              <td class="text-center fw-bold">1</td>
+              <td><div class="fw-bold text-dark">Doctor Consultation Fee</div></td>
+              <td class="text-center">1</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.total_amount) }}</td>
+              <td class="text-end fw-semibold">{{ "%.2f"|format(bill.total_amount) }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
         </table>
+      </div>
 
+      <!-- 5. Bottom Section: Payment Method & Notes (Left) | Subtotal & Total Amount (Right) -->
+      <div class="row g-4 align-items-start mb-4">
+        <!-- Left Column: Payment & Notes -->
+        <div class="col-md-7">
+          <div class="mb-3">
+            <label class="fw-bold text-dark d-block mb-2">Payment Method:</label>
+            <div class="d-flex gap-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" {% if bill.payment_method == 'Cash' or not bill.payment_method %}checked{% endif %} disabled>
+                <label class="form-check-label fw-bold text-dark">Cash</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" {% if bill.payment_method == 'UPI' %}checked{% endif %} disabled>
+                <label class="form-check-label fw-bold text-dark">UPI</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" {% if bill.payment_method == 'Card' %}checked{% endif %} disabled>
+                <label class="form-check-label fw-bold text-dark">Card</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-primary-subtle text-primary border border-primary-subtle rounded-3 mb-4 fw-bold">
+            <i class="bi bi-check-lg me-1"></i> Payment Received. Thank you!
+          </div>
+
+          <!-- Notes Card -->
+          <div class="bill-card-box">
+            <div class="d-flex align-items-start gap-2">
+              <i class="bi bi-journal-text fs-5 text-primary"></i>
+              <div>
+                <strong class="text-dark d-block mb-1">Notes:</strong>
+                <ul class="mb-0 ps-3 text-muted small">
+                  <li>Keep this bill for future reference.</li>
+                  <li>Medicine return not applicable.</li>
+                  <li>For any queries, contact the clinic.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Subtotal, Discount, Total, Signature -->
+        <div class="col-md-5">
+          <div class="bill-card-box mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-muted">Subtotal</span>
+              <span class="fw-bold text-dark">₹ {{ "%.2f"|format(subtotal) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2 text-success">
+              <span>Discount</span>
+              <span class="fw-bold">- ₹ {{ "%.2f"|format(bill.discount or 0) }}</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-extrabold fs-5 text-dark">Total Amount</span>
+              <span class="fw-extrabold fs-4 text-dark">₹ {{ "%.2f"|format(bill.total_amount) }}</span>
+            </div>
+          </div>
+
+          <!-- Signature Box -->
+          <div class="text-center pt-3">
+            <div class="border-top pt-2 d-inline-block px-4" style="border-color: #94a3b8 !important;">
+              <div class="fw-bold text-dark">Dr. {{ current_user.name }}</div>
+              <small class="text-muted">Authorized Signature</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Bottom Dark Blue Footer Bar -->
+    <div class="bill-footer-bar mt-1">
+      {{ current_user.clinic_name }} &nbsp;|&nbsp; Your Health, Our Priority &nbsp;|&nbsp; Thank You!
+    </div>
+  </div>
 </div>
-
 {% endblock %}

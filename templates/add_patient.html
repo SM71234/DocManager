@@ -1,69 +1,90 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-person-plus-fill me-2"></i> Add New Patient Profile</h4>
+        <a href="{{ url_for('patients.search_patient') }}" class="btn btn-sm btn-light border">Cancel</a>
+      </div>
 
-<div class="card shadow">
-
-    <div class="card-header">
-        <h3>Add Patient</h3>
-    </div>
-
-    <div class="card-body">
-
-        <form method="POST">
-
-            <div class="mb-3">
-                <label>Full Name</label>
-                <input type="text"
-                       name="name"
-                       class="form-control"
-                       required>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('patients.add_patient') }}">
+          <div class="row g-3">
+            <div class="col-12"><h6 class="fw-bold text-muted text-uppercase border-bottom pb-2">1. Personal & Contact Information</h6></div>
+            
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Patient Full Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. John Doe" required />
             </div>
 
-            <div class="mb-3">
-                <label>Phone Number</label>
-                <input type="text"
-                       name="phone"
-                       class="form-control"
-                       required>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+              <input type="tel" name="phone" class="form-control" placeholder="e.g. +91 98765 43210" required />
             </div>
 
-            <div class="mb-3">
-                <label>Age</label>
-                <input type="number"
-                       name="age"
-                       class="form-control">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" placeholder="johndoe@email.com" />
             </div>
 
-            <div class="mb-3">
-                <label>Gender</label>
-                <select name="gender"
-                        class="form-control">
-
-                    <option value="">Select</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-
-                </select>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Age (Years)</label>
+              <input type="number" name="age" class="form-control" placeholder="e.g. 35" min="0" max="120" />
             </div>
 
-            <div class="mb-3">
-                <label>Address</label>
-                <textarea name="address"
-                          class="form-control">
-                </textarea>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
-            <button
-                class="btn btn-primary">
-                Save Patient
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Blood Group</label>
+              <select name="blood_group" class="form-select">
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label fw-semibold">Emergency Contact Number</label>
+              <input type="text" name="emergency_contact" class="form-control" placeholder="Relation & Phone: Spouse +91 9876500000" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Residential Address</label>
+              <textarea name="address" class="form-control" rows="2" placeholder="Street, City, Zipcode"></textarea>
+            </div>
+
+            <div class="col-12 mt-4"><h6 class="fw-bold text-muted text-uppercase border-bottom pb-2">2. Medical History & Notes</h6></div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Pre-existing Conditions / Medical History</label>
+              <textarea name="medical_history" class="form-control" rows="3" placeholder="e.g. Hypertension, Diabetes Type II, Asthma, Penicillin Allergy"></textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('patients.dashboard') }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-check-lg me-1"></i> Save Patient Profile
             </button>
-
+          </div>
         </form>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

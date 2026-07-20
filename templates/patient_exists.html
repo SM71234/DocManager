@@ -1,75 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+      <div class="card-body">
+        <div class="stats-icon bg-warning-subtle text-warning mx-auto mb-3" style="width: 64px; height: 64px; font-size: 32px;">
+          <i class="bi bi-person-exclamation"></i>
+        </div>
+        <h4 class="fw-bold mb-2">Patient Already Exists!</h4>
+        <p class="text-muted small mb-4">A patient with this phone number is already registered under your clinic directory.</p>
 
-<div class="card shadow">
-
-    <div class="card-body text-center p-5">
-
-        <h2 class="text-danger">
-
-            Patient Already Exists
-
-        </h2>
-
-        <div class="alert alert-danger">
-
-            This patient is already registered in the system.
-
+        <div class="p-3 bg-light rounded-3 border text-start mb-4">
+          <div class="fw-bold text-dark fs-5">{{ patient.name }}</div>
+          <div class="text-muted small mb-1">Code: <span class="badge bg-white text-dark border">{{ patient.patient_code }}</span></div>
+          <div class="text-muted small">Phone: {{ patient.phone }} | Registered: {{ patient.created_at.strftime('%d %b %Y') }}</div>
         </div>
 
-        <hr>
-
-        <h4>
-
-            {{ patient.name }}
-
-        </h4>
-
-        <p>
-
-            <strong>Patient ID:</strong>
-
-            {{ patient.patient_code }}
-
-        </p>
-
-        <p>
-
-            <strong>Phone:</strong>
-
-            {{ patient.phone }}
-
-        </p>
-
-        <div class="mt-4">
-
-            <a
-                href="{{ url_for(
-                    'patient_profile',
-                    patient_id=patient.id
-                ) }}"
-                class="btn btn-primary">
-
-                View Profile
-
-            </a>
-
-            <a
-                href="{{ url_for(
-                    'new_visit',
-                    patient_id=patient.id
-                ) }}"
-                class="btn btn-success">
-
-                Add New Visit
-
-            </a>
-
+        <div class="d-flex justify-content-center gap-2">
+          <a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" class="btn btn-primary fw-bold rounded-3 px-4">
+            <i class="bi bi-person-badge me-1"></i> Open Patient Profile
+          </a>
+          <a href="{{ url_for('patients.add_patient') }}" class="btn btn-light border rounded-3 px-3">Try Again</a>
         </div>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

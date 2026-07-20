@@ -1,184 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-gear-fill me-2"></i> Clinic Settings & Doctor Profile</h4>
+        <a href="{{ url_for('patients.dashboard') }}" class="btn btn-sm btn-light border">Dashboard</a>
+      </div>
 
-<div class="card shadow-sm">
-
-    <div class="card-header">
-
-        <h4 class="mb-0">
-
-            Doctor Profile & Settings
-
-        </h4>
-
-    </div>
-
-    <div class="card-body">
-
-        <form
-            method="POST"
-            enctype="multipart/form-data">
-
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label">
-
-                        Doctor Name
-
-                    </label>
-
-                    <input
-                        type="text"
-                        name="name"
-                        class="form-control"
-                        value="{{ current_user.name }}"
-                        required>
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label">
-
-                        Qualification
-
-                    </label>
-
-                    <input
-                        type="text"
-                        name="qualification"
-                        class="form-control"
-                        value="{{ current_user.qualification or '' }}"
-                        placeholder="MBBS, BAMS, BHMS">
-
-                </div>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Clinic Name
-
-                </label>
-
-                <input
-                    type="text"
-                    name="clinic_name"
-                    class="form-control"
-                    value="{{ current_user.clinic_name }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Clinic Address
-
-                </label>
-
-                <textarea
-                    name="clinic_address"
-                    class="form-control"
-                    rows="3">{{ current_user.clinic_address or '' }}</textarea>
-
-            </div>
-
-            <div class="row">
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label">
-
-                        Phone Number
-
-                    </label>
-
-                    <input
-                        type="text"
-                        name="phone"
-                        class="form-control"
-                        value="{{ current_user.phone }}"
-                        required>
-
-                </div>
-
-                <div class="col-md-6 mb-3">
-
-                    <label class="form-label">
-
-                        Email
-
-                    </label>
-
-                    <input
-                        type="email"
-                        name="email"
-                        class="form-control"
-                        value="{{ current_user.email }}"
-                        required>
-
-                </div>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Clinic Logo
-
-                </label>
-
-                <input
-                    type="file"
-                    name="logo"
-                    class="form-control">
-
-            </div>
-
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('settings.settings') }}" enctype="multipart/form-data">
+          <!-- Doctor Logo Section -->
+          <div class="d-flex align-items-center gap-4 p-4 bg-light rounded-4 border mb-4">
             {% if current_user.logo %}
-
-            <div class="mb-4">
-
-                <label class="form-label">
-
-                    Current Logo
-                    <p>{{ current_user.logo }}</p>
-                </label>
-                
-                <br>
-
-                <img
-                    src="{{ url_for(
-                        'static',
-                        filename='uploads/' + current_user.logo
-                    ) }}"
-                    width="150"
-                    class="rounded shadow">
-
-            </div>
-
+              <img src="{{ url_for('static', filename='uploads/' + current_user.logo) }}" class="rounded-circle border border-primary p-1" style="width: 80px; height: 80px; object-fit: cover;" alt="Logo" />
+            {% else %}
+              <div class="avatar display-6 rounded-circle" style="width: 80px; height: 80px;">{{ current_user.name[0] }}</div>
             {% endif %}
 
-            <button
-                type="submit"
-                class="btn btn-primary">
+            <div>
+              <h6 class="fw-bold m-0">Clinic Branding Logo</h6>
+              <small class="text-muted d-block mb-2">This logo will appear on all printed PDF prescriptions and billing receipts.</small>
+              <input type="file" name="logo" class="form-control form-control-sm" accept=".png,.jpg,.jpeg,.webp" />
+            </div>
+          </div>
 
-                Save Settings
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Doctor Full Name</label>
+              <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required />
+            </div>
 
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Clinic / Hospital Name</label>
+              <input type="text" name="clinic_name" class="form-control" value="{{ current_user.clinic_name }}" required />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Medical Qualifications / Degrees</label>
+              <input type="text" name="qualification" class="form-control" placeholder="e.g. MBBS, MD (General Medicine)" value="{{ current_user.qualification or '' }}" />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phone Number</label>
+              <input type="tel" name="phone" class="form-control" value="{{ current_user.phone }}" required />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Clinic Full Address</label>
+              <textarea name="clinic_address" class="form-control" rows="3" placeholder="Suite #, Medical Building, Street, City">{{ current_user.clinic_address or '' }}</textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('patients.dashboard') }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-check-lg me-1"></i> Save Changes
             </button>
-
+          </div>
         </form>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

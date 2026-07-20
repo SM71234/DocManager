@@ -1,102 +1,81 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-10 col-xl-9">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-pencil-square me-2"></i> Edit Patient Profile</h4>
+        <a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" class="btn btn-sm btn-light border">Back to Profile</a>
+      </div>
 
-<div class="card shadow">
-
-    <div class="card-header">
-
-        <h3>Edit Patient</h3>
-
-    </div>
-
-    <div class="card-body">
-
-        <form method="POST">
-
-            <div class="mb-3">
-                <label>Name</label>
-
-                <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    value="{{ patient.name }}"
-                    required>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('patients.edit_patient', patient_id=patient.id) }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Patient Full Name</label>
+              <input type="text" name="name" class="form-control" value="{{ patient.name }}" required />
             </div>
 
-            <div class="mb-3">
-                <label>Phone</label>
-
-                <input
-                    type="text"
-                    name="phone"
-                    class="form-control"
-                    value="{{ patient.phone }}"
-                    required>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Phone Number</label>
+              <input type="tel" name="phone" class="form-control" value="{{ patient.phone }}" required />
             </div>
 
-            <div class="mb-3">
-                <label>Age</label>
-
-                <input
-                    type="number"
-                    name="age"
-                    class="form-control"
-                    value="{{ patient.age }}">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" value="{{ patient.email or '' }}" />
             </div>
 
-            <div class="mb-3">
-                <label>Gender</label>
-
-                <select
-                    name="gender"
-                    class="form-control">
-
-                    <option value="Male"
-                        {% if patient.gender=="Male" %}
-                        selected
-                        {% endif %}>
-                        Male
-                    </option>
-
-                    <option value="Female"
-                        {% if patient.gender=="Female" %}
-                        selected
-                        {% endif %}>
-                        Female
-                    </option>
-
-                    <option value="Other"
-                        {% if patient.gender=="Other" %}
-                        selected
-                        {% endif %}>
-                        Other
-                    </option>
-
-                </select>
-
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Age (Years)</label>
+              <input type="number" name="age" class="form-control" value="{{ patient.age or '' }}" />
             </div>
 
-            <div class="mb-3">
-                <label>Address</label>
-
-                <textarea
-                    name="address"
-                    class="form-control">{{ patient.address }}</textarea>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Gender</label>
+              <select name="gender" class="form-select">
+                <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+              </select>
             </div>
 
-            <button
-                class="btn btn-primary">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Blood Group</label>
+              <select name="blood_group" class="form-select">
+                <option value="">Select Blood Group</option>
+                {% for bg in ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] %}
+                  <option value="{{ bg }}" {% if patient.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                {% endfor %}
+              </select>
+            </div>
 
-                Update Patient
+            <div class="col-md-8">
+              <label class="form-label fw-semibold">Emergency Contact</label>
+              <input type="text" name="emergency_contact" class="form-control" value="{{ patient.emergency_contact or '' }}" />
+            </div>
 
+            <div class="col-12">
+              <label class="form-label fw-semibold">Residential Address</label>
+              <textarea name="address" class="form-control" rows="2">{{ patient.address or '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Pre-existing Medical History</label>
+              <textarea name="medical_history" class="form-control" rows="3">{{ patient.medical_history or '' }}</textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-check-lg me-1"></i> Update Profile
             </button>
-
+          </div>
         </form>
-
+      </div>
     </div>
-
+  </div>
 </div>
-
 {% endblock %}

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+  <h3 class="fw-bold text-primary mb-1"><i class="bi bi-bar-chart-line me-2"></i> Clinical Analytics & Practice Performance</h3>
+  <p class="text-muted">Interactive real-time charts detailing patient flow, clinical trends, and revenue growth.</p>
+</div>
+
+<!-- Charts Grid -->
+<div class="row g-4 mb-4">
+  <!-- Line Chart: Weekly Patient Flow -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold m-0"><i class="bi bi-graph-up text-primary me-2"></i> Patient Visits Trend (Last 7 Days)</h5>
+      </div>
+      <div class="card-body p-4">
+        <canvas id="visitsTrendChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Doughnut Chart: Gender Ratio -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold m-0"><i class="bi bi-pie-chart text-success me-2"></i> Patient Demographics</h5>
+      </div>
+      <div class="card-body p-4 d-flex align-items-center justify-content-center">
+        <canvas id="genderRatioChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar Chart: Daily Revenue -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold m-0"><i class="bi bi-currency-rupee text-warning me-2"></i> Daily Billing Revenue (INR)</h5>
+      </div>
+      <div class="card-body p-4">
+        <canvas id="revenueBarChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar Chart: Top Clinical Diagnoses -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 h-100">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold m-0"><i class="bi bi-virus text-danger me-2"></i> Top Diagnoses Distribution</h5>
+      </div>
+      <div class="card-body p-4">
+        <canvas id="topDiagnosesChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('/api/analytics-data')
+        .then(res => res.json())
+        .then(data => {
+            // 1. Visits Line Chart
+            const vCtx = document.getElementById('visitsTrendChart')?.getContext('2d');
+            if (vCtx) {
+                new Chart(vCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Visits',
+                            data: data.visits,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.15)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+
+            // 2. Gender Doughnut
+            const gCtx = document.getElementById('genderRatioChart')?.getContext('2d');
+            if (gCtx) {
+                new Chart(gCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Male', 'Female', 'Other'],
+                        datasets: [{
+                            data: data.gender,
+                            backgroundColor: ['#3b82f6', '#ec4899', '#94a3b8']
+                        }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                });
+            }
+
+            // 3. Revenue Bar Chart
+            const rCtx = document.getElementById('revenueBarChart')?.getContext('2d');
+            if (rCtx) {
+                new Chart(rCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Revenue (₹)',
+                            data: data.revenue,
+                            backgroundColor: '#10b981',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            // 4. Top Diagnoses Chart
+            const dCtx = document.getElementById('topDiagnosesChart')?.getContext('2d');
+            if (dCtx) {
+                new Chart(dCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.top_diagnoses_labels,
+                        datasets: [{
+                            label: 'Cases Count',
+                            data: data.top_diagnoses_data,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+        });
+});
+</script>
+{% endblock %}

@@ -1,48 +1,161 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
 
-<div class="card shadow">
-  <div class="card-header">
-    <h3>New Visit</h3>
-  </div>
-
-  <div class="card-body">
-    <h5>Patient: {{ patient.name }}</h5>
-
-    <hr />
-
-    <form method="POST">
-      <div class="mb-3">
-        <label>Reason</label>
-        <textarea name="reason" class="form-control" required></textarea>
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-11 col-xl-10">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+        <div>
+          <h4 class="fw-bold m-0 text-primary"><i class="bi bi-prescription2 me-2"></i> New Clinical Visit & Prescription</h4>
+          <p class="text-muted small mb-0">Patient: <strong>{{ patient.name }}</strong> ({{ patient.patient_code }}) | Phone: {{ patient.phone }}</p>
+        </div>
+        <a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" class="btn btn-sm btn-light border">Back to Profile</a>
       </div>
 
-      <div class="mb-3">
-        <label>Diagnosis</label>
-        <textarea name="diagnosis" class="form-control"></textarea>
-      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('visits.new_visit', patient_id=patient.id) }}">
+          <!-- Section 1: Clinical Symptoms & Diagnosis -->
+          <div class="row g-3 mb-4">
+            <div class="col-12"><h6 class="fw-bold text-muted text-uppercase border-bottom pb-2">1. Clinical Consultation & Diagnosis</h6></div>
+            
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Chief Reason / Complaint</label>
+              <textarea name="reason" class="form-control" rows="2" placeholder="e.g. High grade fever, coughing for 3 days, headaches"></textarea>
+            </div>
 
-      <div class="mb-3">
-        <label>Treatment</label>
-        <textarea name="treatment" class="form-control"></textarea>
-      </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Clinical Diagnosis</label>
+              <textarea name="diagnosis" class="form-control" rows="2" placeholder="e.g. Upper Respiratory Tract Infection (URTI)"></textarea>
+            </div>
 
-      <div class="mb-3">
-        <label>Prescription</label>
-        <textarea name="prescription" class="form-control"></textarea>
-      </div>
-      <div class="mb-3">
-        <label>Follow Up Date</label>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Treatment Plan & Procedures</label>
+              <textarea name="treatment" class="form-control" rows="2" placeholder="e.g. Steam inhalation 2x daily, complete bed rest for 3 days"></textarea>
+            </div>
+          </div>
 
-        <input type="date" name="follow_up_date" class="form-control" />
-      </div>
-      <div class="mb-3">
-        <label>Notes</label>
-        <textarea name="notes" class="form-control"></textarea>
-      </div>
+          <!-- Section 2: Structured Medicine Prescription Array -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+              <h6 class="fw-bold text-muted text-uppercase m-0">2. Structured Prescription Builder (Rx)</h6>
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" id="addMedRowBtn">
+                <i class="bi bi-plus-circle me-1"></i> Add Medicine Row
+              </button>
+            </div>
 
-      <button class="btn btn-success">Save Visit</button>
-    </form>
+            <div class="table-responsive">
+              <table class="table table-bordered align-middle" id="medicineTable">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 25%;">Medicine Name <span class="text-danger">*</span></th>
+                    <th style="width: 15%;">Dosage</th>
+                    <th style="width: 20%;">Frequency</th>
+                    <th style="width: 15%;">Duration</th>
+                    <th style="width: 20%;">Instructions</th>
+                    <th style="width: 5%;" class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="medicineTableBody">
+                  <!-- Row 1 -->
+                  <tr>
+                    <td><input type="text" name="med_name[]" class="form-control" placeholder="e.g. Paracetamol 650mg" required /></td>
+                    <td><input type="text" name="med_dosage[]" class="form-control" placeholder="1 tablet" /></td>
+                    <td>
+                      <select name="med_frequency[]" class="form-select">
+                        <option value="1-0-1 (Twice daily)">1-0-1 (Twice daily)</option>
+                        <option value="1-1-1 (Thrice daily)">1-1-1 (Thrice daily)</option>
+                        <option value="1-0-0 (Morning)">1-0-0 (Morning)</option>
+                        <option value="0-0-1 (Night)">0-0-1 (Night)</option>
+                        <option value="As needed (SOS)">As needed (SOS)</option>
+                      </select>
+                    </td>
+                    <td><input type="text" name="med_duration[]" class="form-control" placeholder="5 Days" /></td>
+                    <td><input type="text" name="med_instructions[]" class="form-control" placeholder="After meals" /></td>
+                    <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row-btn"><i class="bi bi-trash"></i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-2">
+              <label class="form-label fw-semibold small text-muted">Additional Raw Prescription Notes (Optional)</label>
+              <textarea name="prescription" class="form-control" rows="2" placeholder="Any additional free-form prescription instructions..."></textarea>
+            </div>
+          </div>
+
+          <!-- Section 3: Follow-up & Doctor Notes -->
+          <div class="row g-3 mb-4">
+            <div class="col-12"><h6 class="fw-bold text-muted text-uppercase border-bottom pb-2">3. Follow-up & Advice</h6></div>
+            
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Next Follow-up Date</label>
+              <div class="input-group">
+                <input type="date" name="follow_up_date" id="followUpDateInput" class="form-control" />
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFollowUp(7)">+7 Days</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFollowUp(14)">+14 Days</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setFollowUp(30)">+30 Days</button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Doctor Advice / Internal Notes</label>
+              <textarea name="notes" class="form-control" rows="2" placeholder="Internal notes or lifestyle advice..."></textarea>
+            </div>
+          </div>
+
+          <div class="pt-3 border-top d-flex justify-content-end gap-2">
+            <a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}" class="btn btn-light px-4">Cancel</a>
+            <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+              <i class="bi bi-check-circle-fill me-1"></i> Save Visit & Generate Rx
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const tableBody = document.getElementById("medicineTableBody");
+    const addBtn = document.getElementById("addMedRowBtn");
+
+    addBtn?.addEventListener("click", () => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td><input type="text" name="med_name[]" class="form-control" placeholder="Medicine Name" required /></td>
+            <td><input type="text" name="med_dosage[]" class="form-control" placeholder="Dosage" /></td>
+            <td>
+              <select name="med_frequency[]" class="form-select">
+                <option value="1-0-1 (Twice daily)">1-0-1 (Twice daily)</option>
+                <option value="1-1-1 (Thrice daily)">1-1-1 (Thrice daily)</option>
+                <option value="1-0-0 (Morning)">1-0-0 (Morning)</option>
+                <option value="0-0-1 (Night)">0-0-1 (Night)</option>
+                <option value="As needed (SOS)">As needed (SOS)</option>
+              </select>
+            </td>
+            <td><input type="text" name="med_duration[]" class="form-control" placeholder="Duration" /></td>
+            <td><input type="text" name="med_instructions[]" class="form-control" placeholder="Instructions" /></td>
+            <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row-btn"><i class="bi bi-trash"></i></button></td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    tableBody?.addEventListener("click", (e) => {
+        if (e.target.closest(".remove-row-btn")) {
+            const rows = tableBody.querySelectorAll("tr");
+            if (rows.length > 1) {
+                e.target.closest("tr").remove();
+            }
+        }
+    });
+});
+
+function setFollowUp(days) {
+    const dateInput = document.getElementById("followUpDateInput");
+    const today = new Date();
+    today.setDate(today.getDate() + days);
+    dateInput.value = today.toISOString().split("T")[0];
+}
+</script>
 {% endblock %}

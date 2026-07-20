@@ -1,122 +1,91 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card-header d-flex justify-content-between align-items-center">
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+      <div>
+        <h4 class="fw-bold m-0 text-primary"><i class="bi bi-calendar-event me-2"></i> Appointments Management</h4>
+        <p class="text-muted small mb-0">Schedule and manage patient appointments in calendar or list view.</p>
+      </div>
 
-    <h4 class="mb-0">
-        Appointments
-    </h4>
-
-    <a
-        href="{{ url_for('new_appointment') }}"
-        class="btn btn-primary">
-
-        <i class="bi bi-plus-circle"></i>
-        New Appointment
-
-    </a>
-
-</div>
-
-
-    <div class="card-body">
-
-        <table class="table">
-
-            <thead>
-
-               <tr>
-                    <th>Patient</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-
-            </thead>
-
-           <tbody>
-
-{% for appointment in appointments %}
-
-<tr>
-
-    <td>
-        {{ appointment.patient.name }}
-    </td>
-
-    <td>
-        {{ appointment.appointment_date }}
-    </td>
-
-    <td>
-        {{ appointment.appointment_time }}
-    </td>
-
-    <td>
-
-        <span class="badge bg-primary">
-
-            {{ appointment.status }}
-
-        </span>
-
-    </td>
-    <td>
-
-    {% if appointment.status == "Scheduled" %}
-
-        <a
-            href="{{ url_for(
-                'complete_appointment',
-                appointment_id=appointment.id
-            ) }}"
-            class="btn btn-success btn-sm">
-
-            Complete
-
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('appointments.new_appointment') }}" class="btn btn-primary fw-bold rounded-3 shadow-sm">
+          <i class="bi bi-calendar-plus me-1"></i> Schedule Appointment
         </a>
-
-        <a
-            href="{{ url_for(
-                'cancel_appointment',
-                appointment_id=appointment.id
-            ) }}"
-            class="btn btn-danger btn-sm">
-
-            Cancel
-
-        </a>
-
-    {% else %}
-
-        -
-
-    {% endif %}
-
-</td>
-</tr>
-
-{% else %}
-
-<tr>
-
-    <td colspan="4" class="text-center text-muted">
-
-        No appointments found.
-
-    </td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-        </table>
-
+      </div>
     </div>
 
-</div>
+    <!-- Filter Bar -->
+    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border mb-4">
+      <div class="btn-group" role="group">
+        <a href="{{ url_for('appointments.appointments', status='All') }}" class="btn btn-sm {% if filter_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="{{ url_for('appointments.appointments', status='Scheduled') }}" class="btn btn-sm {% if filter_status == 'Scheduled' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %}">Scheduled</a>
+        <a href="{{ url_for('appointments.appointments', status='Completed') }}" class="btn btn-sm {% if filter_status == 'Completed' %}btn-success{% else %}btn-outline-secondary{% endif %}">Completed</a>
+        <a href="{{ url_for('appointments.appointments', status='Cancelled') }}" class="btn btn-sm {% if filter_status == 'Cancelled' %}btn-danger{% else %}btn-outline-secondary{% endif %}">Cancelled</a>
+      </div>
 
+      <div class="text-muted small fw-semibold">Showing {{ appointments|length }} Appointments</div>
+    </div>
+
+    <!-- Appointments Directory Table -->
+    {% if appointments %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date & Time</th>
+              <th>Patient Name</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appt in appointments %}
+              <tr>
+                <td>
+                  <div class="fw-bold text-dark">{{ appt.appointment_date.strftime('%d %b %Y') }}</div>
+                  <span class="badge bg-light text-primary border">{{ appt.appointment_time.strftime('%I:%M %p') }}</span>
+                </td>
+                <td>
+                  <a href="{{ url_for('patients.patient_profile', patient_id=appt.patient.id) }}" class="fw-bold text-dark text-decoration-none">
+                    {{ appt.patient.name }} <small class="text-muted">({{ appt.patient.patient_code }})</small>
+                  </a>
+                </td>
+                <td class="fw-semibold">{{ appt.patient.phone }}</td>
+                <td>
+                  {% if appt.status == 'Scheduled' %}
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1 rounded-pill">Scheduled</span>
+                  {% elif appt.status == 'Completed' %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">Completed</span>
+                  {% else %}
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">Cancelled</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted">{{ appt.notes or '-' }}</td>
+                <td class="text-end">
+                  {% if appt.status == 'Scheduled' %}
+                    <a href="{{ url_for('appointments.complete_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-success rounded-pill px-3 me-1">Complete</a>
+                    <a href="{{ url_for('appointments.cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Cancel</a>
+                  {% else %}
+                    <span class="text-muted small">Done</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state py-5">
+        <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+        <h5 class="fw-bold">No Appointments Found</h5>
+        <p class="text-muted small">No appointments match the selected filter criteria.</p>
+        <a href="{{ url_for('appointments.new_appointment') }}" class="btn btn-primary rounded-3 px-4"><i class="bi bi-calendar-plus me-1"></i> Book Appointment</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
