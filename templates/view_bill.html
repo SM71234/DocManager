@@ -51,10 +51,14 @@
         <i class="bi bi-arrow-left me-1"></i> Back to Patient Profile
       </a>
       <div class="d-flex gap-2">
+        {% set wa_text = "Hello " ~ patient.name ~ ", here is your invoice summary from " ~ current_user.clinic_name ~ ":\nBill No: BC-2026-" ~ "%04d"|format(bill.id) ~ "\nTotal Amount: Rs. " ~ "%.2f"|format(bill.total_amount) ~ "\nStatus: " ~ bill.status ~ "\nThank you!" %}
+        <a href="https://api.whatsapp.com/send?phone={{ patient.phone|replace(' ', '')|replace('+', '') }}&text={{ wa_text|urlencode }}" target="_blank" class="btn btn-success fw-bold shadow-sm">
+          <i class="bi bi-whatsapp me-1"></i> Share on WhatsApp
+        </a>
         <button onclick="window.print()" class="btn btn-outline-primary fw-bold shadow-sm">
           <i class="bi bi-printer me-1"></i> Print Bill
         </button>
-        <a href="{{ url_for('billing.bill_pdf', bill_id=bill.id) }}" class="btn btn-success fw-bold shadow-sm">
+        <a href="{{ url_for('billing.bill_pdf', bill_id=bill.id) }}" class="btn btn-outline-success fw-bold shadow-sm">
           <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF
         </a>
       </div>

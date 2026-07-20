@@ -30,6 +30,11 @@ def settings():
         current_user.clinic_address = request.form.get("clinic_address", "").strip()
         current_user.qualification = request.form.get("qualification", "").strip()
 
+        # WhatsApp Integration Credentials
+        current_user.whatsapp_enabled = bool(request.form.get("whatsapp_enabled"))
+        current_user.whatsapp_phone_id = request.form.get("whatsapp_phone_id", "").strip()
+        current_user.whatsapp_access_token = request.form.get("whatsapp_access_token", "").strip()
+
         logo = request.files.get("logo")
         if logo and logo.filename:
             filename = secure_filename(logo.filename)
@@ -42,7 +47,7 @@ def settings():
                 flash("Invalid file format. Allowed formats: PNG, JPG, JPEG, WEBP", "warning")
 
         db.session.commit()
-        flash("Settings and profile updated successfully!", "success")
+        flash("Settings & WhatsApp configuration updated successfully!", "success")
         return redirect(url_for("settings.settings"))
 
     return render_template("settings.html", page_title="Settings & Profile")

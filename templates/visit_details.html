@@ -10,7 +10,11 @@
           <p class="text-muted small mb-0">Visit Date: <strong>{{ visit.visit_date.strftime('%d %b %Y') }}</strong> | Patient: {{ patient.name }} ({{ patient.patient_code }})</p>
         </div>
         <div class="d-flex gap-2">
-          <a href="{{ url_for('visits.prescription_pdf', visit_id=visit.id) }}" class="btn btn-success fw-bold shadow-sm">
+          {% set wa_rx_text = "Hello " ~ patient.name ~ ", Dr. " ~ current_user.name ~ " (" ~ current_user.clinic_name ~ ") has created your prescription for " ~ visit.visit_date.strftime('%d %b %Y') ~ ".\nDiagnosis: " ~ (visit.diagnosis or 'Consultation') ~ "\nThank you!" %}
+          <a href="https://api.whatsapp.com/send?phone={{ patient.phone|replace(' ', '')|replace('+', '') }}&text={{ wa_rx_text|urlencode }}" target="_blank" class="btn btn-success fw-bold shadow-sm">
+            <i class="bi bi-whatsapp me-1"></i> Share on WhatsApp
+          </a>
+          <a href="{{ url_for('visits.prescription_pdf', visit_id=visit.id) }}" class="btn btn-outline-success fw-bold shadow-sm">
             <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF Rx
           </a>
           <a href="{{ url_for('visits.edit_visit', visit_id=visit.id) }}" class="btn btn-outline-primary">

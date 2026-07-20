@@ -19,6 +19,12 @@ class Doctor(UserMixin, db.Model):
     clinic_address = db.Column(db.Text)
     qualification = db.Column(db.String(100))
     logo = db.Column(db.String(255))
+    
+    # WhatsApp Integration Credentials
+    whatsapp_enabled = db.Column(db.Boolean, default=False)
+    whatsapp_phone_id = db.Column(db.String(100))
+    whatsapp_access_token = db.Column(db.Text)
+    
     created_at = db.Column(db.DateTime, default=utc_now)
 
     patients = db.relationship("Patient", backref="doctor", lazy=True, cascade="all, delete-orphan")

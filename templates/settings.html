@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-10 col-xl-9">
-    <div class="card border-0 shadow-sm rounded-4">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
       <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
         <h4 class="fw-bold m-0 text-primary"><i class="bi bi-gear-fill me-2"></i> Clinic Settings & Doctor Profile</h4>
         <a href="{{ url_for('patients.dashboard') }}" class="btn btn-sm btn-light border">Dashboard</a>
@@ -20,13 +20,16 @@
             {% endif %}
 
             <div>
-              <h6 class="fw-bold m-0">Clinic Branding Logo</h6>
+              <h6 class="fw-bold m-0 text-dark">Clinic Branding Logo</h6>
               <small class="text-muted d-block mb-2">This logo will appear on all printed PDF prescriptions and billing receipts.</small>
               <input type="file" name="logo" class="form-control form-control-sm" accept=".png,.jpg,.jpeg,.webp" />
             </div>
           </div>
 
-          <div class="row g-3">
+          <!-- Doctor Profile Details -->
+          <div class="row g-3 mb-4">
+            <div class="col-12"><h6 class="fw-bold text-muted text-uppercase border-bottom pb-2">1. Doctor & Clinic Profile</h6></div>
+
             <div class="col-md-6">
               <label class="form-label fw-semibold">Doctor Full Name</label>
               <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required />
@@ -54,14 +57,39 @@
 
             <div class="col-12">
               <label class="form-label fw-semibold">Clinic Full Address</label>
-              <textarea name="clinic_address" class="form-control" rows="3" placeholder="Suite #, Medical Building, Street, City">{{ current_user.clinic_address or '' }}</textarea>
+              <textarea name="clinic_address" class="form-control" rows="2" placeholder="Suite #, Medical Building, Street, City">{{ current_user.clinic_address or '' }}</textarea>
+            </div>
+          </div>
+
+          <!-- WhatsApp Business Cloud API Section -->
+          <div class="row g-3 mb-4">
+            <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                <h6 class="fw-bold text-muted text-uppercase m-0"><i class="bi bi-whatsapp text-success me-2"></i> 2. Official Meta WhatsApp Cloud API Setup</h6>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="whatsapp_enabled" id="waToggle" {% if current_user.whatsapp_enabled %}checked{% endif %}>
+                  <label class="form-check-label fw-bold text-success" for="waToggle">Enable Automated WhatsApp</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Meta Phone Number ID</label>
+              <input type="text" name="whatsapp_phone_id" class="form-control" placeholder="e.g. 105948372615432" value="{{ current_user.whatsapp_phone_id or '' }}" />
+              <small class="text-muted">Found in Meta Developer Dashboard > WhatsApp > API Setup</small>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Permanent Access Token</label>
+              <input type="password" name="whatsapp_access_token" class="form-control" placeholder="e.g. EAAG..." value="{{ current_user.whatsapp_access_token or '' }}" />
+              <small class="text-muted">System User Access Token with messaging permissions</small>
             </div>
           </div>
 
           <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
             <a href="{{ url_for('patients.dashboard') }}" class="btn btn-light px-4">Cancel</a>
             <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-              <i class="bi bi-check-lg me-1"></i> Save Changes
+              <i class="bi bi-check-lg me-1"></i> Save All Settings
             </button>
           </div>
         </form>

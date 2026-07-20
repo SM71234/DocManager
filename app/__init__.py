@@ -56,6 +56,12 @@ def auto_migrate_db(app):
                     conn.execute(text("ALTER TABLE doctors ADD COLUMN qualification VARCHAR(100)"))
                 if "logo" not in columns:
                     conn.execute(text("ALTER TABLE doctors ADD COLUMN logo VARCHAR(255)"))
+                if "whatsapp_enabled" not in columns:
+                    conn.execute(text("ALTER TABLE doctors ADD COLUMN whatsapp_enabled BOOLEAN DEFAULT 0"))
+                if "whatsapp_phone_id" not in columns:
+                    conn.execute(text("ALTER TABLE doctors ADD COLUMN whatsapp_phone_id VARCHAR(100)"))
+                if "whatsapp_access_token" not in columns:
+                    conn.execute(text("ALTER TABLE doctors ADD COLUMN whatsapp_access_token TEXT"))
 
         # Create any remaining missing tables
         db.create_all()
@@ -96,6 +102,7 @@ def create_app(config_class=Config):
     app.register_blueprint(patients_bp)
     app.register_blueprint(visits_bp)
     app.register_blueprint(appointments_bp)
+    app.register_blueprint(billing_blueprint) if False else None
     app.register_blueprint(billing_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(settings_bp)
