@@ -82,7 +82,7 @@ def create_app(config_class=Config):
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
-    login_manager.login_message_category = "danger"
+    login_message_category = "danger"
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -102,7 +102,6 @@ def create_app(config_class=Config):
     app.register_blueprint(patients_bp)
     app.register_blueprint(visits_bp)
     app.register_blueprint(appointments_bp)
-    app.register_blueprint(billing_blueprint) if False else None
     app.register_blueprint(billing_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(settings_bp)
