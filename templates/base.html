@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>{{ page_title|default('DocManager') }} | Healthcare Manager</title>
 
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/healthcare.png') }}" />
@@ -83,22 +83,27 @@
       {% if current_user.is_authenticated %}
       <!-- Top Navigation Bar -->
       <div class="topbar">
-        <div class="d-flex align-items-center gap-3">
-          <button id="menuToggle" class="btn btn-light d-lg-none border" onclick="document.querySelector('.sidebar').classList.toggle('active')">
-            <i class="bi bi-list fs-4"></i>
+        <div class="d-flex align-items-center gap-2">
+          <button id="menuToggle" class="btn btn-light d-lg-none border p-2" onclick="document.querySelector('.sidebar').classList.toggle('active')">
+            <i class="bi bi-list fs-5"></i>
           </button>
           
-          <!-- Command Palette Trigger -->
-          <button class="cmd-trigger-btn trigger-cmd">
+          <!-- Command Palette Trigger (Desktop) -->
+          <button class="cmd-trigger-btn trigger-cmd d-none d-md-flex">
             <i class="bi bi-search"></i>
             <span>Search or command...</span>
             <span class="cmd-key">Ctrl K</span>
           </button>
+
+          <!-- Command Palette Trigger (Mobile Icon Only) -->
+          <button class="btn btn-light rounded-circle border shadow-sm p-2 d-md-none trigger-cmd" title="Search">
+            <i class="bi bi-search text-primary"></i>
+          </button>
         </div>
 
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-2">
           <!-- Realtime Clock -->
-          <div id="liveClock" class="d-none d-md-block text-muted small fw-medium"></div>
+          <div id="liveClock" class="d-none d-lg-block text-muted small fw-medium"></div>
 
           <!-- Dark Mode Toggle Button -->
           <button id="themeToggleBtn" class="btn btn-light rounded-circle border shadow-sm p-2" title="Toggle Theme">
@@ -111,7 +116,7 @@
               <i class="bi bi-bell-fill text-secondary"></i>
               <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
             </button>
-            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-3" style="width: 300px;">
+            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-3" style="width: 280px; max-width: 90vw;">
               <h6 class="fw-bold border-bottom pb-2 mb-2">Notifications</h6>
               <div class="d-flex align-items-center gap-2 mb-2 small text-muted">
                 <i class="bi bi-clock-history text-warning"></i>
@@ -126,14 +131,14 @@
 
           <!-- Doctor Profile Dropdown -->
           <div class="dropdown">
-            <button class="profile-btn border shadow-sm" data-bs-toggle="dropdown">
+            <button class="profile-btn border shadow-sm p-1 p-md-2" data-bs-toggle="dropdown">
               {% if current_user.logo %}
                 <img src="{{ url_for('static', filename='uploads/' + current_user.logo) }}" class="doctor-logo" alt="Logo" />
               {% else %}
-                <div class="avatar">{{ current_user.name[0] }}</div>
+                <div class="avatar" style="width:34px; height:34px; font-size:14px;">{{ current_user.name[0] }}</div>
               {% endif %}
 
-              <div class="text-start d-none d-md-block">
+              <div class="text-start d-none d-md-block ms-1">
                 <div class="fw-bold lh-1 text-dark" style="font-size: 14px;">Dr. {{ current_user.name }}</div>
                 <small class="text-muted" style="font-size: 11px;">{{ current_user.clinic_name }}</small>
               </div>
@@ -152,12 +157,12 @@
       {% endif %}
 
       <!-- Page Content Container -->
-      <div class="container-fluid p-4">
+      <div class="container-fluid p-2 p-md-4">
         <!-- Flashed Alert Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3" role="alert">
+              <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 mb-3 rounded-3" role="alert">
                 <i class="bi {% if category == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

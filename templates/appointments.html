@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="card border-0 shadow-sm rounded-4 mb-4">
-  <div class="card-body p-4">
+  <div class="card-body p-3 p-md-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
       <div>
         <h4 class="fw-bold m-0 text-primary"><i class="bi bi-calendar-event me-2"></i> Appointments Management</h4>
@@ -17,8 +17,8 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3 border mb-4">
-      <div class="btn-group" role="group">
+    <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded-3 border mb-4 gap-2">
+      <div class="btn-group flex-wrap" role="group">
         <a href="{{ url_for('appointments.appointments', status='All') }}" class="btn btn-sm {% if filter_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
         <a href="{{ url_for('appointments.appointments', status='Scheduled') }}" class="btn btn-sm {% if filter_status == 'Scheduled' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %}">Scheduled</a>
         <a href="{{ url_for('appointments.appointments', status='Completed') }}" class="btn btn-sm {% if filter_status == 'Completed' %}btn-success{% else %}btn-outline-secondary{% endif %}">Completed</a>
@@ -49,28 +49,33 @@
                   <div class="fw-bold text-dark">{{ appt.appointment_date.strftime('%d %b %Y') }}</div>
                   <span class="badge bg-light text-primary border">{{ appt.appointment_time.strftime('%I:%M %p') }}</span>
                 </td>
-                <td>
-                  <a href="{{ url_for('patients.patient_profile', patient_id=appt.patient.id) }}" class="fw-bold text-dark text-decoration-none">
-                    {{ appt.patient.name }} <small class="text-muted">({{ appt.patient.patient_code }})</small>
+                <td class="fw-bold">
+                  <a href="{{ url_for('patients.patient_profile', patient_id=appt.patient.id) }}" class="text-decoration-none text-primary">
+                    {{ appt.patient.name }}
                   </a>
+                  <small class="text-muted d-block">{{ appt.patient.patient_code }}</small>
                 </td>
-                <td class="fw-semibold">{{ appt.patient.phone }}</td>
+                <td>{{ appt.patient.phone }}</td>
                 <td>
                   {% if appt.status == 'Scheduled' %}
-                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1 rounded-pill">Scheduled</span>
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-clock me-1"></i> Scheduled</span>
                   {% elif appt.status == 'Completed' %}
-                    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">Completed</span>
+                    <span class="badge bg-success px-3 py-2 rounded-pill"><i class="bi bi-check-circle me-1"></i> Completed</span>
                   {% else %}
-                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill">Cancelled</span>
+                    <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="bi bi-x-circle me-1"></i> Cancelled</span>
                   {% endif %}
                 </td>
                 <td class="small text-muted">{{ appt.notes or '-' }}</td>
                 <td class="text-end">
                   {% if appt.status == 'Scheduled' %}
-                    <a href="{{ url_for('appointments.complete_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-success rounded-pill px-3 me-1">Complete</a>
-                    <a href="{{ url_for('appointments.cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-outline-danger rounded-pill px-3">Cancel</a>
+                    <a href="{{ url_for('appointments.complete_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-outline-success me-1" title="Mark Completed">
+                      <i class="bi bi-check-lg"></i>
+                    </a>
+                    <a href="{{ url_for('appointments.cancel_appointment', appointment_id=appt.id) }}" class="btn btn-sm btn-outline-danger" title="Cancel Appointment">
+                      <i class="bi bi-x-lg"></i>
+                    </a>
                   {% else %}
-                    <span class="text-muted small">Done</span>
+                    <span class="text-muted small">No actions</span>
                   {% endif %}
                 </td>
               </tr>
@@ -79,11 +84,13 @@
         </table>
       </div>
     {% else %}
-      <div class="empty-state py-5">
+      <div class="empty-state">
         <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
-        <h5 class="fw-bold">No Appointments Found</h5>
-        <p class="text-muted small">No appointments match the selected filter criteria.</p>
-        <a href="{{ url_for('appointments.new_appointment') }}" class="btn btn-primary rounded-3 px-4"><i class="bi bi-calendar-plus me-1"></i> Book Appointment</a>
+        <h5 class="fw-bold text-dark">No Appointments Found</h5>
+        <p class="text-muted small mb-3">No appointments match the selected filter criteria.</p>
+        <a href="{{ url_for('appointments.new_appointment') }}" class="btn btn-primary fw-bold px-4">
+          <i class="bi bi-calendar-plus me-1"></i> Book Appointment
+        </a>
       </div>
     {% endif %}
   </div>
